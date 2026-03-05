@@ -170,18 +170,6 @@ Hotspot is designed to work seamlessly across all device sizes:
 - **Tablet**: Adapted UI for medium screens
 - **Mobile**: Touch-optimized interface for small screens
 
-
-
-## 📄 License
-
-This project is licensed under the ISC License. See the LICENSE file for details.
-
-## 👨‍💻 Authors
-
-- **Abishek** - [GitHub Profile](https://github.com/Abishek00ujj)
-- **Mithran B** - [GitHub Profile](https://github.com/MITHRAN-BALACHANDER)
-
-
 ---
 
 **Happy Chatting! 🎉**
