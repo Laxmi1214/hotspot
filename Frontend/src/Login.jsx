@@ -171,7 +171,7 @@ const Login = () => {
       </AnimatePresence>
 
       {/* Updated CSS Styles */}
-      <style jsx>{`
+      <style>{`
         .animated-gradient-bg {
           background: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #f5576c, #4facfe, #00f2fe);
           background-size: 400% 400%;
