@@ -3,7 +3,7 @@ import React, { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Send } from 'lucide-react';
 
-const MessageInput = ({ onSendMessage }) => {
+const MessageInput = ({ onSendMessage, disabled = false }) => {
   const [isTyping, setIsTyping] = useState(false);
   const messageRef = useRef(null);
 
@@ -39,10 +39,11 @@ const MessageInput = ({ onSendMessage }) => {
           <input
             ref={messageRef}
             type="text"
+            disabled={disabled}
             onChange={handleTyping}
             onKeyDown={handleKeyDown}
-            className="w-full p-4 pr-12 rounded-full bg-white/20 backdrop-blur-lg border border-white/30 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
-            placeholder="Type your message..."
+            className="w-full p-4 pr-12 rounded-full bg-white/20 backdrop-blur-lg border border-white/30 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-60"
+            placeholder={disabled ? "Waiting for connection..." : "Type your message..."}
           />
           {isTyping && (
             <motion.div
@@ -63,6 +64,7 @@ const MessageInput = ({ onSendMessage }) => {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={handleSend}
+          disabled={disabled}
           className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-full flex items-center justify-center text-white transition-all duration-200 shadow-lg hover:shadow-xl"
         >
           <Send size={20} />

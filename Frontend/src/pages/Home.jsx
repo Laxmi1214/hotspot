@@ -16,11 +16,13 @@ const Home = () => {
   
   const [nick, setNick] = useState(localStorage.getItem("nickname"));
   const [location, setLocation] = useState({ latitude: null, longitude: null });
+  const [locationError, setLocationError] = useState('');
   const [code, setCode] = useState(null);
   const [messages, setMessages] = useState([]);
   const [isConnecting, setIsConnecting] = useState(false);
+  const [connectionStatus, setConnectionStatus] = useState('Getting location...');
 
-  const Backend = 'https://hotspot5.onrender.com';
+  const Backend = import.meta.env.VITE_BACKEND_URL || 'http://localhost:199';
   const UserData = JSON.parse(localStorage.getItem('userdata'));
   const nickName = localStorage.getItem('nickname');
 
@@ -39,31 +41,81 @@ const Home = () => {
   const handleSendMessage = (messageText) => {
     if (socketRef.current) {
       socketRef.current.emit("sendMessage", messageText);
+    } else {
+      toast.error("Chat is not connected yet.");
     }
   };
 
   useEffect(() => {
     if (navigator.geolocation) {
       setIsConnecting(true);
-      navigator.geolocation.getCurrentPosition((position) => {
-        setLocation({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-        });
-        setIsConnecting(false);
-      });
+      setConnectionStatus('Getting location...');
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setLocation({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          });
+          setLocationError('');
+          setConnectionStatus('Location found');
+        },
+        (error) => {
+          const message =
+            error.code === error.PERMISSION_DENIED
+              ? 'Location permission denied. Please allow location access.'
+              : error.code === error.TIMEOUT
+                ? 'Location request timed out. Please try again.'
+                : 'Unable to get your location.';
+
+          setLocationError(message);
+          setConnectionStatus(message);
+          setIsConnecting(false);
+          toast.error(message);
+        },
+        {
+          enableHighAccuracy: false,
+          timeout: 10000,
+          maximumAge: 60000,
+        }
+      );
+    } else {
+      const message = 'Geolocation is not supported by this browser.';
+      setLocationError(message);
+      setConnectionStatus(message);
+      toast.error(message);
     }
   }, []);
 
   useEffect(() => {
-    if (location.latitude && location.longitude && nickName) {
+    if (location.latitude !== null && location.longitude !== null && nickName) {
       const la = Math.floor(location.latitude / 0.01);
       const lo = Math.floor(location.longitude / 0.01);
       const SecretCode = `${(la)}_${(lo)}`;
       setCode(SecretCode);
+      setIsConnecting(true);
+      setConnectionStatus('Connecting to chat...');
 
       socketRef.current = io(Backend);
-      socketRef.current.emit("join", { name: nickName, room: SecretCode });
+      socketRef.current.on("connect", () => {
+        socketRef.current.emit("join", { name: nickName, room: SecretCode }, (error) => {
+          if (error) {
+            setConnectionStatus(error);
+            setIsConnecting(false);
+            toast.error(error);
+            return;
+          }
+
+          setConnectionStatus('Connected');
+          setIsConnecting(false);
+        });
+      });
+
+      socketRef.current.on("connect_error", () => {
+        const message = "Unable to connect to chat server.";
+        setConnectionStatus(message);
+        setIsConnecting(false);
+        toast.error(message);
+      });
 
       toast.success(`Welcome ${UserData?.name}!`, { 
         duration: 3000, 
@@ -80,7 +132,7 @@ const Home = () => {
       });
 
       return () => {
-        socketRef.current.disconnect();
+        socketRef.current?.disconnect();
       };
     }
   }, [location, nickName]);
@@ -116,7 +168,9 @@ const Home = () => {
                 {/* Chat Header */}
                 <ChatHeader 
                   location={location}
+                  locationError={locationError}
                   isConnecting={isConnecting}
+                  connectionStatus={connectionStatus}
                 />
 
                 {/* Chat Messages */}
@@ -125,11 +179,14 @@ const Home = () => {
                   nickName={nickName}
                   nick={nick}
                   isConnecting={isConnecting}
+                  connectionStatus={connectionStatus}
+                  locationError={locationError}
                 />
 
                 {/* Message Input */}
                 <MessageInput 
                   onSendMessage={handleSendMessage}
+                  disabled={isConnecting || Boolean(locationError)}
                 />
               </motion.div>
             )}

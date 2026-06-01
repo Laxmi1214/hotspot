@@ -3,7 +3,10 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { MessageCircle, MapPin } from 'lucide-react';
 
-const ChatHeader = ({ location, isConnecting }) => {
+const ChatHeader = ({ location, locationError, isConnecting, connectionStatus }) => {
+  const hasLocation = location.latitude !== null && location.longitude !== null;
+  const isError = Boolean(locationError);
+
   return (
     <motion.div
       initial={{ y: -20, opacity: 0 }}
@@ -21,17 +24,17 @@ const ChatHeader = ({ location, isConnecting }) => {
             <div className="flex items-center space-x-2 text-white/60 text-sm">
               <MapPin size={14} />
               <span>
-                {location.latitude && location.longitude
+                {hasLocation
                   ? `${location.latitude.toFixed(2)}, ${location.longitude.toFixed(2)}`
-                  : 'Getting location...'}
+                  : locationError || 'Getting location...'}
               </span>
             </div>
           </div>
         </div>
         <div className="flex items-center space-x-2">
-          <div className={`w-2 h-2 rounded-full ${isConnecting ? 'bg-yellow-500' : 'bg-green-500'} animate-pulse`}></div>
+          <div className={`w-2 h-2 rounded-full ${isError ? 'bg-red-500' : isConnecting ? 'bg-yellow-500' : 'bg-green-500'} animate-pulse`}></div>
           <span className="text-white/60 text-sm">
-            {isConnecting ? 'Connecting...' : 'Connected'}
+            {connectionStatus || (isConnecting ? 'Connecting...' : 'Connected')}
           </span>
         </div>
       </div>

@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Chat from './Chat';
 import Herchat from './Herchat';
 
-const ChatMessages = ({ messages, nickName, nick, isConnecting }) => {
+const ChatMessages = ({ messages, nickName, nick, isConnecting, connectionStatus, locationError }) => {
   const chatContainerRef = useRef(null);
 
   useEffect(() => {
@@ -42,7 +42,7 @@ const ChatMessages = ({ messages, nickName, nick, isConnecting }) => {
             ))}
           </AnimatePresence>
 
-          {isConnecting && (
+          {(isConnecting || locationError) && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -50,10 +50,14 @@ const ChatMessages = ({ messages, nickName, nick, isConnecting }) => {
             >
               <div className="bg-white/10 backdrop-blur-lg rounded-full px-4 py-2 text-white/70 text-sm">
                 <div className="flex items-center space-x-2">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></div>
-                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                  <span className="ml-2">Connecting...</span>
+                  {!locationError && (
+                    <>
+                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></div>
+                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                    </>
+                  )}
+                  <span className="ml-2">{connectionStatus || 'Connecting...'}</span>
                 </div>
               </div>
             </motion.div>
