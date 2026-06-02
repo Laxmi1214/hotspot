@@ -22,7 +22,7 @@ const Home = () => {
   const [isConnecting, setIsConnecting] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState('Getting location...');
 
-  const Backend = import.meta.env.VITE_BACKEND_URL || 'http://localhost:199';
+  const Backend = https://hotspot-qqmq.onrender.com;
   const UserData = JSON.parse(localStorage.getItem('userdata'));
   const nickName = localStorage.getItem('nickname');
 
