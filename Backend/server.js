@@ -9,6 +9,7 @@ app.use(cors());
 app.use(express.json());
 
 const server = http.createServer(app);
+const PORT = process.env.PORT || 199;
 
 const io = socketio(server, {
     cors: {
@@ -64,6 +65,6 @@ io.on('connection', (socket) => {
     });
 });
 
-server.listen(199, () => {
-    console.log("🚀 Server running at http://localhost:199");
+server.listen(PORT, () => {
+    console.log(`🚀 Server running at ${PORT}`);
 });
