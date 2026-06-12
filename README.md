@@ -47,7 +47,7 @@ Before running this application, make sure you have the following installed:
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/Abishek00ujj/Hotspot.git
+git clone https://github.com/Laxmi1214/hotspot.git
 cd Hotspot
 ```
 
